@@ -1,6 +1,13 @@
 import * as React from 'react';
 import openSocket from 'socket.io-client';
-import { Container, Input, Table, Button } from 'semantic-ui-react';
+import {
+    Container,
+    Input,
+    Button,
+    Progress,
+    Grid,
+    Label
+} from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { ITaskProgress } from '../models/TaskProgress';
 import { IRootReducerState } from '../store/configureStore';
@@ -33,8 +40,7 @@ class HomeContainer extends React.Component<
         super(props);
 
         this.state = {
-            url:
-                'https://file-examples.com/wp-content/uploads/2017/10/file-example_PDF_500_kB.pdf'
+            url: 'http://localhost:4001/txt?size=100000000&throttle=10000000'
         };
 
         this.socket = openSocket('http://localhost:4000');
@@ -62,6 +68,10 @@ class HomeContainer extends React.Component<
     render() {
         const { url } = this.state;
         const { taskProgress } = this.props;
+        const percent = (
+            100 *
+            (taskProgress.downloaded / taskProgress.total)
+        ).toFixed(0);
 
         return (
             <Container className="pt-10 pb-10" textAlign="center">
@@ -79,38 +89,30 @@ class HomeContainer extends React.Component<
                     <input />
                     <Button onClick={this.handleUrlSubmit}>Downloaded</Button>
                 </Input>
-                <Table singleLine>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell width={3}>
-                                Downloaded
-                            </Table.HeaderCell>
-                            <Table.HeaderCell width={3}>Total</Table.HeaderCell>
-                            <Table.HeaderCell width={5}>
-                                Status
-                            </Table.HeaderCell>
-                            <Table.HeaderCell width={5}>
-                                Message
-                            </Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                        <Table.Row>
-                            <Table.Cell width={3}>
-                                {bytesToSize(taskProgress.downloaded)}
-                            </Table.Cell>
-                            <Table.Cell width={3}>
+                <Grid>
+                    <Grid.Row className="pt-5">
+                        <Grid.Column width={14}>
+                            <Progress percent={percent} progress autoSuccess>
+                                {bytesToSize(taskProgress.downloaded)}/
                                 {bytesToSize(taskProgress.total)}
-                            </Table.Cell>
-                            <Table.Cell width={5}>
+                            </Progress>
+                        </Grid.Column>
+                        <Grid.Column width={2}>
+                            <Label
+                                style={{ width: '100%' }}
+                                color={
+                                    (taskProgress.status === 'DONE' &&
+                                        'green') ||
+                                    (taskProgress.status === 'ERROR' &&
+                                        'red') ||
+                                    'grey'
+                                }
+                            >
                                 {taskProgress.status}
-                            </Table.Cell>
-                            <Table.Cell width={5}>
-                                {taskProgress.message}
-                            </Table.Cell>
-                        </Table.Row>
-                    </Table.Body>
-                </Table>
+                            </Label>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
             </Container>
         );
     }

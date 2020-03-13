@@ -4,7 +4,7 @@ import { ITaskProgress } from '../models/TaskProgress';
 const defaultState: ITaskProgress = {
     downloaded: 0,
     total: 0,
-    status: '',
+    status: 'PENDING',
     message: ''
 };
 

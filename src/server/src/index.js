@@ -1,12 +1,17 @@
-const https = require('https');
 const fs = require('fs');
 const slugify = require('slugify');
+const urlParser = require('url');
 
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 const DOWNLOAD_DIR = 'downloads';
+
+const supportedProtocols = {
+    'http:': require('http'),
+    'https:': require('https')
+};
 
 if (!fs.existsSync(DOWNLOAD_DIR)) {
     fs.mkdirSync(DOWNLOAD_DIR);
@@ -24,20 +29,37 @@ function urlToFilename(url) {
 function download(url, socket) {
     const filename = urlToFilename(url);
     const file = fs.createWriteStream(DOWNLOAD_DIR + '/' + filename);
-    const request = https.get(url, function(response) {
+    const request = supportedProtocols[
+        urlParser.parse(url).protocol || 'http:'
+    ].get(url, function(response) {
         const contentLength = response.headers['content-length']
             ? Number(response.headers['content-length'])
             : 0;
 
+        response.pipe(file);
+
         let done = 0;
+        let donePercentage = 0;
+        let lastDonePercent = 0;
+        socket.emit('task-progress', {
+            downloaded: done,
+            total: contentLength,
+            status: 'DOWNLOADING',
+            message: ''
+        });
+
         response.on('data', chunk => {
             done += chunk.length;
-            socket.emit('task-progress', {
-                downloaded: done,
-                total: contentLength,
-                status: 'DOWNLOADING',
-                message: ''
-            });
+            donePercentage = Math.trunc((done / contentLength) * 100);
+            if (donePercentage > lastDonePercent) {
+                lastDonePercent = donePercentage;
+                socket.emit('task-progress', {
+                    downloaded: done,
+                    total: contentLength,
+                    status: 'DOWNLOADING',
+                    message: ''
+                });
+            }
         });
 
         response.on('end', () => {
