@@ -3,23 +3,39 @@ const http = require('http').createServer(app);
 const fs = require('fs');
 const Throttle = require('throttle');
 
-const TEMP_FILE = __dirname + '/file.tmp';
-
-function clearTempFile() {
-    fs.writeFileSync(TEMP_FILE, '');
+const TEMP_DIR = __dirname + '/temp/';
+if (!fs.existsSync(TEMP_DIR)) {
+    fs.mkdirSync(TEMP_DIR);
+} else {
+    fs.rmdirSync(TEMP_DIR, { recursive: true });
+    fs.mkdirSync(TEMP_DIR);
 }
 
-function generateTempFile(size) {
+function createTempFile() {
+    return (
+        TEMP_DIR +
+        `file-${Math.random()
+            .toString(36)
+            .substring(4)}.tmp`
+    );
+}
+
+function deleteTempFile(file) {
+    fs.unlinkSync(file);
+    console.log('deleted file: ', file);
+}
+
+function generateTempFile(file, size) {
     let fileSize = 0;
     let chunkSize = Math.max(Math.min(size / 2, 10000), 1);
     while (fileSize < size) {
-        fs.appendFileSync(TEMP_FILE, 'a'.repeat(chunkSize));
-        fileSize = fs.statSync(TEMP_FILE)['size'];
+        fs.appendFileSync(file, 'a'.repeat(chunkSize));
+        fileSize = fs.statSync(file)['size'];
         chunkSize = Math.max(Math.min((size - fileSize) / 2, 10000), 1);
     }
 }
 
-app.get('/txt', function(req, res) {
+app.get('/test.txt', function(req, res) {
     const fileSize = Math.round(
         req.query.size ? Number(req.query.size) : Math.random() * 100000
     );
@@ -29,12 +45,17 @@ app.get('/txt', function(req, res) {
     res.setHeader('Content-length', fileSize);
     res.setHeader('Content-type', 'text/plain');
 
-    clearTempFile();
-    generateTempFile(fileSize);
+    const file = createTempFile();
+    generateTempFile(file, fileSize);
 
-    const outputStream = fs.createReadStream(TEMP_FILE);
+    fs.createReadStream(file)
+        .pipe(throttle)
+        .pipe(res);
 
-    outputStream.pipe(throttle).pipe(res);
+    res.on('finish', () => {
+        console.log('finished ', file);
+        deleteTempFile(file);
+    });
 });
 
 http.listen(4001, function() {

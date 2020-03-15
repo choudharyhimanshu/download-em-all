@@ -6,11 +6,11 @@ import {
 } from 'redux';
 import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
-import { ITaskProgress } from '../models/TaskProgress';
-import taskReducer from '../reducers/task.reducer';
+import { ITask } from '../models/Task';
+import tasksReducer from '../reducers/tasks.reducer';
 
 export interface IRootReducerState {
-    task: ITaskProgress;
+    tasks: ITask[];
 }
 
 const middlewares: Middleware[] = [thunk];
@@ -24,7 +24,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const store = createStore(
     combineReducers<IRootReducerState>({
-        task: taskReducer
+        tasks: tasksReducer
     }),
     applyMiddleware(...middlewares)
 );
