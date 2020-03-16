@@ -1,4 +1,6 @@
 const urlParser = require('url');
+const pathParser = require('path');
+const isValidPath = require('is-valid-path');
 
 const logger = require('../services/logger.service').getLogger(
     'task-controller'
@@ -57,6 +59,17 @@ function createTask(socket, taskRequest) {
             `[${taskRequest.id}] Using DEFAULT output directory: ${DEFAULT_DOWNLOAD_DIR}`
         );
         taskRequest.outputDir = DEFAULT_DOWNLOAD_DIR;
+    } else if (!isValidPath(taskRequest.outputDir)) {
+        logger.warn(
+            `[${taskRequest.id}] Invalid output directory: ${taskRequest.outputDir}`
+        );
+        socket.emit('task-reject', {
+            ...taskRequest,
+            message: 'Invalid output directory.'
+        });
+        return;
+    } else if (!pathParser.isAbsolute(taskRequest.outputDir)) {
+        taskRequest.outputDir = pathParser.resolve(taskRequest.outputDir);
     }
 
     logger.info(`[${taskRequest.id}] Adding task`);

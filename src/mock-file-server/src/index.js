@@ -3,6 +3,9 @@ const http = require('http').createServer(app);
 const fs = require('fs');
 const Throttle = require('throttle');
 
+const logger = require('log4js').getLogger('index');
+logger.level = 'debug';
+
 const TEMP_DIR = __dirname + '/temp/';
 if (!fs.existsSync(TEMP_DIR)) {
     fs.mkdirSync(TEMP_DIR);
@@ -11,7 +14,7 @@ if (!fs.existsSync(TEMP_DIR)) {
     fs.mkdirSync(TEMP_DIR);
 }
 
-function createTempFile() {
+function createTempFilename() {
     return (
         TEMP_DIR +
         `file-${Math.random()
@@ -22,7 +25,7 @@ function createTempFile() {
 
 function deleteTempFile(file) {
     fs.unlinkSync(file);
-    console.log('deleted file: ', file);
+    logger.info(`Deleted file: ${file}`);
 }
 
 function generateTempFile(file, size) {
@@ -42,22 +45,27 @@ app.get('/test.txt', function(req, res) {
     const throttle = new Throttle(
         req.query.throttle ? Number(req.query.throttle) : 100
     );
+    logger.info(`File size: ${fileSize} | Throttle: ${throttle.bps}`);
+
     res.setHeader('Content-length', fileSize);
     res.setHeader('Content-type', 'text/plain');
 
-    const file = createTempFile();
+    const file = createTempFilename();
+    logger.info(`Temp filename: ${file}`);
     generateTempFile(file, fileSize);
+    logger.info(`Put content to temp file: ${file}`);
 
     fs.createReadStream(file)
         .pipe(throttle)
         .pipe(res);
+    logger.info(`Temp file piped to response: ${file}`);
 
-    res.on('finish', () => {
-        console.log('finished ', file);
+    res.on('close', () => {
+        logger.info(`Response closed: ${file}`);
         deleteTempFile(file);
     });
 });
 
 http.listen(4001, function() {
-    console.log('listening on *:4001');
+    logger.info('Listening on *:4001');
 });

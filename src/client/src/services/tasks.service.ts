@@ -9,7 +9,11 @@ socket.on('task-update', (task: ITask) => {
     updateTask(store.dispatch)(task);
 });
 
-export function submitTasks(urls: string[]) {
+socket.on('task-reject', (task: ITask) => {
+    updateTask(store.dispatch)({ ...task, status: ETaskStatus.ERROR });
+});
+
+export function submitTasks(urls: string[], outputDir: string) {
     const filteredUrls = urls.filter(url => !!url);
     filteredUrls.forEach(url => {
         const task = {
@@ -25,7 +29,8 @@ export function submitTasks(urls: string[]) {
         createTask(store.dispatch)(task).then(() => {
             socket.emit('task-request', {
                 id: task.id,
-                url: task.url
+                url: task.url,
+                outputDir: outputDir
             });
         });
     });

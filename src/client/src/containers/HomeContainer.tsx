@@ -7,7 +7,8 @@ import {
     Form,
     Icon,
     Header,
-    List
+    List,
+    Input
 } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { ITask } from '../models/Task';
@@ -28,6 +29,8 @@ const HomeContainer = (props: IHomeContainerProps) => {
             'http://localhost:4001/test.txt?size=10000&throttle=1000'
         ].join('\n')
     );
+    const [outputDir, setOutputDir] = React.useState<string>('');
+
     const { tasks } = props;
 
     return (
@@ -42,7 +45,11 @@ const HomeContainer = (props: IHomeContainerProps) => {
                 </Grid.Row>
                 <Grid.Row>
                     <Grid.Column>
-                        <Form onSubmit={() => submitTasks(urls.split('\n'))}>
+                        <Form
+                            onSubmit={() =>
+                                submitTasks(urls.split('\n'), outputDir)
+                            }
+                        >
                             <Form.Input label="Paste your URLs here">
                                 <TextArea
                                     placeholder="http://download.com/download"
@@ -56,11 +63,21 @@ const HomeContainer = (props: IHomeContainerProps) => {
                                     }
                                 />
                             </Form.Input>
+                            <Form.Input label="Download folder">
+                                <Input
+                                    placeholder="./downloads/"
+                                    value={outputDir}
+                                    onChange={event =>
+                                        setOutputDir(event.target.value)
+                                    }
+                                />
+                            </Form.Input>
                             <Button
                                 type="submit"
                                 floated="right"
                                 color="blue"
                                 basic
+                                disabled={!urls}
                             >
                                 Submit
                                 <Icon name="send" className="ml-1 mr-0" />

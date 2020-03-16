@@ -38,7 +38,20 @@ function processTask(socket, task, callback) {
         logger.warn(
             `[${task.id}] Creating output directory: ${task.outputDir}`
         );
-        fs.mkdirSync(task.outputDir);
+        try {
+            fs.mkdirSync(task.outputDir);
+        } catch (error) {
+            logger.warn(
+                `[${task.id}] Error creating output dirctory: ${task.outputDir}`
+            );
+            socket.emit('task-update', {
+                id: task.id,
+                status: 'ERROR',
+                message: `${error.toString()}`
+            });
+            callback();
+            return;
+        }
     }
 
     const filename = utilService.filenameFromUrl(task.url, task.outputDir);
