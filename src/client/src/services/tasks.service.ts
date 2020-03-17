@@ -3,7 +3,9 @@ import { createTask, updateTask } from '../actions/tasks.action';
 import store from '../store/configureStore';
 import { ETaskStatus, ITask } from '../models/Task';
 
-const socket: SocketIOClient.Socket = openSocket('http://localhost:4000');
+export const socket: SocketIOClient.Socket = openSocket(
+    'http://localhost:4000'
+);
 
 socket.on('task-update', (task: ITask) => {
     updateTask(store.dispatch)(task);
