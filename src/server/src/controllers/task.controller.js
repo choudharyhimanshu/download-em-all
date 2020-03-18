@@ -1,6 +1,7 @@
 const urlParser = require('url');
 const pathParser = require('path');
 const isValidPath = require('is-valid-path');
+const Task = require('../models/task').Task;
 
 const logger = require('../services/logger.service').getLogger(
     'task-controller'
@@ -72,14 +73,13 @@ function createTask(socket, taskRequest) {
         taskRequest.outputDir = pathParser.resolve(taskRequest.outputDir);
     }
 
-    logger.info(`[${taskRequest.id}] Adding task`);
+    logger.error(taskRequest.outputDir);
+    task = new Task(taskRequest.id, taskRequest.url, taskRequest.outputDir);
+
+    logger.info(`[${taskRequest.id}] Adding task: ${task}`);
     taskService.addTask({
         socket,
-        task: {
-            id: taskRequest.id,
-            url: taskRequest.url,
-            outputDir: taskRequest.outputDir
-        }
+        task
     });
     logger.info(`[${taskRequest.id}] Task added`);
 }

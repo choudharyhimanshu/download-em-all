@@ -44,11 +44,10 @@ function processTask(socket, task, callback) {
             logger.warn(
                 `[${task.id}] Error creating output dirctory: ${task.outputDir}`
             );
-            socket.emit('task-update', {
-                id: task.id,
-                status: 'ERROR',
-                message: `${error.toString()}`
-            });
+            task.status = 'ERROR';
+            task.message = error.toString();
+            task.emitUpdate(socket);
+
             callback();
             return;
         }
@@ -71,28 +70,28 @@ function processTask(socket, task, callback) {
 
     downloadProgress.on('error', error => {
         logger.error(`[${task.id}] Error in download: ${error.toString()}`);
-        socket.emit('task-update', {
-            id: task.id,
-            status: 'ERROR',
-            message: error.toString()
-        });
+        task.status = 'ERROR';
+        task.message = error.toString();
+        task.emitUpdate(socket);
+
         fileWriteStream.destroy();
         logger.error(`[${task.id}] Destroyed file write stream`);
+
         fs.unlinkSync(task.filepath);
         logger.error(`[${task.id}] Deleted error file: ${task.filepath}`);
+
         callback();
     });
 
     downloadProgress.on('finish', downloaded => {
         logger.info(`[${task.id}] Finished downloading.`);
-        socket.emit('task-update', {
-            id: task.id,
-            downloaded,
-            status: 'SUCCESS',
-            filepath: task.filepath
-        });
+        task.status = 'SUCCESS';
+        task.downloaded = downloaded;
+        task.emitUpdate(socket);
+
         fileWriteStream.close();
         logger.info(`[${task.id}] Closed file write stream`);
+
         callback();
     });
 
@@ -100,12 +99,10 @@ function processTask(socket, task, callback) {
         logger.info(
             `[${task.id}] Updating download progress: ${downloaded}/${total}`
         );
-        socket.emit('task-update', {
-            id: task.id,
-            downloaded,
-            total,
-            status: 'PROCESSING'
-        });
+        task.status = 'PROCESSING';
+        task.downloaded = downloaded;
+        task.total = total;
+        task.emitUpdate(socket);
     });
 }
 

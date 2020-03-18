@@ -56,6 +56,9 @@ function download(url, outputFileStream) {
             }
         }
     );
+    request.on('error', error => {
+        downloadEmitter.emit('error', error);
+    });
     return downloadEmitter;
 }
 
