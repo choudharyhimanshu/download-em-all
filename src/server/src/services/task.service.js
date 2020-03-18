@@ -85,7 +85,12 @@ function processTask(socket, task, callback) {
 
     downloadProgress.on('finish', downloaded => {
         logger.info(`[${task.id}] Finished downloading.`);
-        task.status = 'SUCCESS';
+        if (task.total && downloaded < task.total) {
+            task.status = 'ERROR';
+            task.message = 'Connection closed in between downloading.';
+        } else {
+            task.status = 'SUCCESS';
+        }
         task.downloaded = downloaded;
         task.emitUpdate(socket);
 

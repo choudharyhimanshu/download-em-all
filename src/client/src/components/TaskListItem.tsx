@@ -72,7 +72,7 @@ const TaskListItem = (props: ITaskListItemProps) => {
                         ERROR: {task.message}
                     </Header>
                 )}
-                {task.filepath && (
+                {task.status === ETaskStatus.SUCCESS && task.filepath && (
                     <Header as="h5" color="blue">
                         Downloaded file: {task.filepath}
                     </Header>

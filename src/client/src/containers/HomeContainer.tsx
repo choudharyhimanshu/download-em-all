@@ -15,6 +15,7 @@ import { ITask } from '../models/Task';
 import { IRootReducerState } from '../store/configureStore';
 import { submitTasks } from '../services/tasks.service';
 import TaskListItem from '../components/TaskListItem';
+import TaskStats from '../components/TasksStats';
 
 export interface IHomeContainerProps {
     tasks: ITask[];
@@ -79,8 +80,8 @@ const HomeContainer = (props: IHomeContainerProps) => {
                                 basic
                                 disabled={!urls}
                             >
-                                Submit
-                                <Icon name="send" className="ml-1 mr-0" />
+                                Download
+                                <Icon name="download" className="ml-1 mr-0" />
                             </Button>
                             <Button
                                 type="button"
@@ -93,6 +94,11 @@ const HomeContainer = (props: IHomeContainerProps) => {
                                 <Icon name="trash" className="ml-1 mr-0" />
                             </Button>
                         </Form>
+                    </Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                    <Grid.Column>
+                        {tasks.length > 0 && <TaskStats tasks={tasks} />}
                     </Grid.Column>
                 </Grid.Row>
                 <Grid.Row className="pt-5">
