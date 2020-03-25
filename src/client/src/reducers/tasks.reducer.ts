@@ -6,22 +6,31 @@ const defaultState: ITask[] = [];
 const tasksReducer = (state: ITask[] = defaultState, action: ITaskAction) => {
     switch (action.type) {
         case ETaskActionType.CREATE: {
-            return [...state, action.data];
-        }
-        case ETaskActionType.UPDATE: {
-            const taskToUpdate = state.find(task => task.id === action.data.id);
-            if (taskToUpdate) {
-                if (action.data.downloaded) {
-                    taskToUpdate.downloaded = action.data.downloaded;
-                }
-                if (action.data.total) {
-                    taskToUpdate.total = action.data.total;
-                }
-                taskToUpdate.status = action.data.status;
-                taskToUpdate.message = action.data.message;
-                taskToUpdate.filepath = action.data.filepath;
+            if (action.data) {
+                return [...state, action.data];
             }
             return [...state];
+        }
+        case ETaskActionType.UPDATE: {
+            const data = action.data;
+            if (data) {
+                const taskToUpdate = state.find(task => task.id === data.id);
+                if (taskToUpdate) {
+                    if (data.downloaded) {
+                        taskToUpdate.downloaded = data.downloaded;
+                    }
+                    if (data.total) {
+                        taskToUpdate.total = data.total;
+                    }
+                    taskToUpdate.status = data.status;
+                    taskToUpdate.message = data.message;
+                    taskToUpdate.filepath = data.filepath;
+                }
+            }
+            return [...state];
+        }
+        case ETaskActionType.CLEAR: {
+            return [...defaultState];
         }
         default: {
             return state;

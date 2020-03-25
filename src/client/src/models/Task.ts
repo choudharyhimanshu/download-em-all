@@ -1,6 +1,5 @@
 export enum ETaskStatus {
     PENDING = 'PENDING',
-    QUEUED = 'QUEUED',
     PROCESSING = 'PROCESSING',
     SUCCESS = 'SUCCESS',
     ERROR = 'ERROR'

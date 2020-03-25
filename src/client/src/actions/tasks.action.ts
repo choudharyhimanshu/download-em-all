@@ -3,12 +3,13 @@ import { ITask } from '../models/Task';
 
 export enum ETaskActionType {
     CREATE = 'TASK_CREATE',
-    UPDATE = 'TASK_UPDATE'
+    UPDATE = 'TASK_UPDATE',
+    CLEAR = 'CLEAR'
 }
 
 export interface ITaskAction {
     type: ETaskActionType;
-    data: ITask;
+    data?: ITask;
 }
 
 export const createTask = (dispatch: Dispatch<ITaskAction>) => {
@@ -25,6 +26,14 @@ export const updateTask = (dispatch: Dispatch<ITaskAction>) => {
         dispatch({
             type: ETaskActionType.UPDATE,
             data: taskProgress
+        });
+    };
+};
+
+export const clearTasks = (dispatch: Dispatch<ITaskAction>) => {
+    return async () => {
+        dispatch({
+            type: ETaskActionType.CLEAR
         });
     };
 };

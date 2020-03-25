@@ -16,8 +16,6 @@ const getTaskStatusIcon = (
     switch (status) {
         case ETaskStatus.PENDING:
             return { name: 'wait' };
-        case ETaskStatus.QUEUED:
-            return { name: 'list' };
         case ETaskStatus.PROCESSING:
             return { name: 'spinner', color: 'blue', loading: true };
         case ETaskStatus.SUCCESS:
@@ -57,7 +55,6 @@ const TaskListItem = (props: ITaskListItemProps) => {
                     progress
                     active={[
                         ETaskStatus.PENDING,
-                        ETaskStatus.QUEUED,
                         ETaskStatus.PROCESSING
                     ].includes(task.status)}
                     success={task.status === ETaskStatus.SUCCESS}
