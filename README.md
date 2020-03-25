@@ -12,7 +12,7 @@
 
 1. Get Node & npm installed in your system. Recommended versions are:
 
-- Node: ^13.x
+- Node: ^12.x
 - npm: ^6.x
 
 2. Download the dependencies using the command `npm install` at the project root
