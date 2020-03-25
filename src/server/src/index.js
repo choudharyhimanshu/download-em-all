@@ -22,6 +22,6 @@ io.on('connection', function(socket) {
     });
 });
 
-http.listen(4000, function() {
-    logger.info('Listening on *:4000');
+http.listen(6051, function() {
+    logger.info('Listening on *:6051');
 });

@@ -4,7 +4,7 @@ import store from '../store/configureStore';
 import { ETaskStatus, ITask } from '../models/Task';
 
 export const socket: SocketIOClient.Socket = openSocket(
-    'http://localhost:4000'
+    'http://localhost:6051'
 );
 
 socket.on('task-update', (task: ITask) => {

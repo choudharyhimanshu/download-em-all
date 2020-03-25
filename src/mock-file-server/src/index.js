@@ -66,6 +66,6 @@ app.get('/test.txt', function(req, res) {
     });
 });
 
-http.listen(4001, function() {
-    logger.info('Listening on *:4001');
+http.listen(6052, function() {
+    logger.info('Listening on *:6052');
 });

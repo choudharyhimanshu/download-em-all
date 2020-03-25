@@ -27,8 +27,8 @@ export interface IHomeContainerProps {
 const HomeContainer = (props: IHomeContainerProps) => {
     const [urls, setUrls] = React.useState<string>(
         [
-            'http://localhost:4001/test.txt?size=1000000000&throttle=100000000',
-            'http://localhost:4001/test.txt?size=10000&throttle=1000',
+            'http://localhost:6052/test.txt?size=100000000&throttle=10000000',
+            'http://localhost:6052/test.txt?size=10000&throttle=1000',
             'https://file-examples.com/wp-content/uploads/2017/10/file-example_PDF_500_kB.pdf',
             'ftp://speedtest.tele2.net/512KB.zip'
         ].join('\n')
